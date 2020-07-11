@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WpfAppPlanReport.EF;
 
 namespace WpfAppPlanReport
 {
@@ -23,6 +24,23 @@ namespace WpfAppPlanReport
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            using (var context = new PlanreportEntities())
+            {
+                foreach (var dep in context.Departments)
+                {
+                    foreach (var plan in dep.Plans)
+                    {
+                        string s = "не выполнено";
+                        if (plan.Reports.Count != 0)
+                            s = plan.Reports.First().ReportText;
+                        ListBoxTest.Items.Add($"{dep.Name} {plan.Datetime} {plan.PlanText} {s}");
+                    }
+                }
+            }
         }
     }
 }

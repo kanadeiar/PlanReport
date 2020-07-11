@@ -5,8 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfAppPlanReport"
         mc:Ignorable="d"
-        Title="План-Отчет" Height="400" Width="600" WindowStartupLocation="CenterScreen">
+        Title="План-Отчет" Height="400" Width="600" WindowStartupLocation="CenterScreen" Loaded="MainWindow_OnLoaded">
     <Grid>
-        
+        <ListBox x:Name="ListBoxTest">
+
+        </ListBox>
     </Grid>
 </Window>
