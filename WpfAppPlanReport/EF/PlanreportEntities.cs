@@ -5,10 +5,10 @@ namespace WpfAppPlanReport.EF
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Linq;
 
-    public partial class PlanreportEntities : DbContext
+    public partial class PlanReportEntities : DbContext
     {
-        public PlanreportEntities()
-            : base("name=PlanreportEntities")
+        public PlanReportEntities()
+            : base("name=PlanReportEntities")
         {
         }
 

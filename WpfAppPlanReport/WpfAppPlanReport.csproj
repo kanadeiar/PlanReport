@@ -89,7 +89,7 @@
     </Compile>
     <Compile Include="EF\Department.cs" />
     <Compile Include="EF\Plan.cs" />
-    <Compile Include="EF\PlanreportEntities.cs" />
+    <Compile Include="EF\PlanReportEntities.cs" />
     <Compile Include="EF\Report.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
