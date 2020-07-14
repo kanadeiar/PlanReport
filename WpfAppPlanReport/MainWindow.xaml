@@ -71,17 +71,30 @@
             <TabItem Header="Отчеты о выполнении планов">
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
-                        <Button x:Name="ButtonRefteshPlan" Content="Обновить" Width="100" Margin="3"/>
+                        <Button x:Name="ButtonRefreshReport" Content="Обновить" Width="100" Margin="3" Click="ButtonRefreshReport_OnClick"/>
                     </StackPanel>
                     <GroupBox DockPanel.Dock="Bottom" Header="Составление отчета">
                         <WrapPanel>
-                            <Button x:Name="ButtonAddPlan" Content="Добавить" Width="100" Margin="5"/>
-                            <Button x:Name="ButtonEditPlan" Content="Редактировать" Width="100" Margin="5"/>
-                            <Button x:Name="ButtonDeletePlan" Content="Удалить" Width="100" Margin="5"/>
+                            <Button x:Name="ButtonAddReport" Content="Добавить" Width="100" Margin="5" Click="ButtonAddReport_OnClick"/>
+                            <Button x:Name="ButtonEditReport" Content="Редактировать" Width="100" Margin="5" Click="ButtonEditReport_OnClick"/>
+                            <Button x:Name="ButtonDeleteReport" Content="Удалить" Width="100" Margin="5" Click="ButtonDeleteReport_OnClick"/>
                         </WrapPanel>
                     </GroupBox>
-                    <GroupBox DockPanel.Dock="Bottom" Header="Сведения об отчете:">
-
+                    <GroupBox DockPanel.Dock="Bottom" Header="Сведения об отчете:" DataContext="{Binding SelectedItem, ElementName=ListViewReports}">
+                        <WrapPanel>
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                                <TextBlock Text="Дата:" Margin="0,0,5,0"/>
+                                <TextBlock Text="{Binding ReportDateTime}" Width="100" FontWeight="Bold"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                                <TextBlock Text="Отчет о выполнении:" Margin="0,0,5,0"/>
+                                <TextBlock Text="{Binding ReportText}" Width="300" Height="30" TextWrapping="Wrap" FontWeight="Bold"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                                <TextBlock Text="Выполнено:" Margin="0,0,5,0"/>
+                                <TextBlock Text="{Binding Complete}" Width="50" FontWeight="Bold"/>
+                            </StackPanel>
+                        </WrapPanel>
                     </GroupBox>
                     <GroupBox Header="Отчеты о выполнении планов за сегодня">
                         <ListView x:Name="ListViewReports" Margin="5">
@@ -89,7 +102,7 @@
                                 <GridView>
                                     <GridViewColumn Header="Дата" Width="80" DisplayMemberBinding="{Binding DateTime}"/>
                                     <GridViewColumn Header="Текст Плана работ" Width="250" DisplayMemberBinding="{Binding PlanText}"/>
-                                    <GridViewColumn Header="Дата отчета" Width="100" DisplayMemberBinding="{Binding DateTimeReport}"/>
+                                    <GridViewColumn Header="Дата отчета" Width="100" DisplayMemberBinding="{Binding ReportDateTime}"/>
                                     <GridViewColumn Header="Отчет о выполенении" Width="250" DisplayMemberBinding="{Binding ReportText}"/>
                                     <GridViewColumn Header="Выполнено" DisplayMemberBinding="{Binding Complete}" />
                                 </GridView>

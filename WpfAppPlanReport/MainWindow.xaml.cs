@@ -109,9 +109,11 @@ namespace WpfAppPlanReport
         /// <summary> Отображаемые данные по отчетам </summary>
         class ReportsLVModel
         {
+            public int Id { get; set; }
             public string DepName { get; set; }
             public string DateTime { get; set; }
             public string PlanText { get; set; }
+            public int ReportId { get; set; }
             public string ReportDateTime { get; set; }
             public string ReportText { get; set; }
             public string Complete { get; set; }
@@ -132,9 +134,11 @@ namespace WpfAppPlanReport
                         var rep = plan.Reports.FirstOrDefault(r => r.Datetime == DateTime.Now);
                         _listReports.Add(new ReportsLVModel
                         {
+                            Id = plan.Id,
                             DepName = plan.Department.Name,
                             DateTime = plan.Datetime?.ToString("dd.MM.yyyy"),
                             PlanText = plan.PlanText,
+                            ReportId = rep?.Id ?? -1,
                             ReportDateTime = rep?.Datetime?.ToString("dd.MM.yyyy") ?? "отсутствует",
                             ReportText = rep?.ReportText ?? "не выполнено",
                             Complete = (rep?.Complete != null && rep.Complete.Value) ? "Да" : "Нет",
@@ -148,7 +152,43 @@ namespace WpfAppPlanReport
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("DepName");
             view.GroupDescriptions.Add(groupDescription);
         }
+        private async void ButtonRefreshReport_OnClick(object sender, RoutedEventArgs e)
+        {
+            ButtonRefreshReport.IsEnabled = false;
+            await ViewDataListViewReports();
+            ButtonRefreshReport.IsEnabled = true;
+        }
+        private void ButtonAddReport_OnClick(object sender, RoutedEventArgs e)
+        {
+            var select = (ReportsLVModel)ListViewReports.SelectedItem;
+            if (select == null)
+                return;
+            if (select.ReportId != -1)
+                return;
+
+
+        }
+        private void ButtonEditReport_OnClick(object sender, RoutedEventArgs e)
+        {
+            var select = (ReportsLVModel)ListViewReports.SelectedItem;
+            if (select == null)
+                return;
+            if (select.ReportId == -1)
+                return;
+
+        }
+        private void ButtonDeleteReport_OnClick(object sender, RoutedEventArgs e)
+        {
+            var select = (ReportsLVModel)ListViewReports.SelectedItem;
+            if (select == null)
+                return;
+            if (select.ReportId == -1)
+                return;
+
+        }
         #endregion
+
+
 
     }
 }
