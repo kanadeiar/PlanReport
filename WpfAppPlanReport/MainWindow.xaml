@@ -80,6 +80,9 @@
                             <Button x:Name="ButtonDeletePlan" Content="Удалить" Width="100" Margin="5"/>
                         </WrapPanel>
                     </GroupBox>
+                    <GroupBox DockPanel.Dock="Bottom" Header="Сведения об отчете:">
+
+                    </GroupBox>
                     <GroupBox Header="Отчеты о выполнении планов за сегодня">
                         <ListView x:Name="ListViewReports" Margin="5">
                             <ListView.View>

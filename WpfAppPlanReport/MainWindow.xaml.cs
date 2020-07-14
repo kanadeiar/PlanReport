@@ -37,6 +37,7 @@ namespace WpfAppPlanReport
             }
             
             await ViewDataInListView();
+            await ViewDataListViewReports();
         }
         #region ListViewAll
         /// <summary> Отображаемые данные по всем </summary>
@@ -58,35 +59,19 @@ namespace WpfAppPlanReport
                 {
                     foreach (var plan in context.Plans)
                     {
-                        if (plan.Reports.Count == 0)
-                        {
-                            _listPlanReport.Add(new PlanReportLVModel
+                        if (_visibleNoCompleteOnly && plan.Reports.Select(r => (r.Complete == true)).Contains(true))
+                            continue;
+                        var repDateMax = plan.Reports.Max(r => r.Datetime);
+                        var rep = plan.Reports.FirstOrDefault(r => r.Datetime == repDateMax);
+                        _listPlanReport.Add(new PlanReportLVModel
                             {
                                 DateTime = plan.Datetime?.ToString("dd.MM.yyyy"),
                                 DepName = plan.Department.Name,
                                 PlanText = plan.PlanText,
-                                ReportDateTime = "не выполнено",
-                                ReportText = "не выполнено",
-                                Complete = "Нет",
+                                ReportDateTime = rep?.Datetime?.ToString("dd.MM.yyyy") ?? "отсутствует",
+                                ReportText = rep?.ReportText ?? "не выполнено",
+                                Complete = (rep?.Complete != null && rep.Complete.Value) ? "Да" : "Нет",
                             });
-                        }
-                        else
-                        {
-                            if (_visibleNoCompleteOnly && plan.Reports.Select(p => (p.Complete == true)).Contains(true))
-                                continue;
-                            foreach (var rep in plan.Reports)
-                            {
-                                _listPlanReport.Add(new PlanReportLVModel
-                                {
-                                    DateTime = plan.Datetime?.ToString("dd.MM.yyyy"),
-                                    DepName = plan.Department.Name,
-                                    PlanText = plan.PlanText,
-                                    ReportDateTime = rep.Datetime?.ToString("dd.MM.yyyy"),
-                                    ReportText = rep.ReportText ?? "не выполнено",
-                                    Complete = (rep.Complete != null && rep.Complete.Value) ? "Да" : "Нет",
-                                });
-                            }
-                        }
                     }
                 }
             });
@@ -139,21 +124,24 @@ namespace WpfAppPlanReport
                 using (var context = new PlanReportEntities())
                 {
                     foreach (var plan in context.Plans.Where(p =>
-                        (p.Datetime == DateTime.Now || p.Reports.Count == 0 ||
-                         !(p.Reports.Select(r => r.Complete).Contains(true)))))
+                        (p.Datetime == DateTime.Now || 
+                         p.Reports.Count == 0 ||
+                         !(p.Reports.Select(r => r.Complete).Contains(true)) ||
+                         (p.Reports.Select(r=> r.Datetime).Contains(DateTime.Now)) )))
                     {
-                        
+                        var rep = plan.Reports.FirstOrDefault(r => r.Datetime == DateTime.Now);
                         _listReports.Add(new ReportsLVModel
                         {
                             DepName = plan.Department.Name,
                             DateTime = plan.Datetime?.ToString("dd.MM.yyyy"),
                             PlanText = plan.PlanText,
-                            
+                            ReportDateTime = rep?.Datetime?.ToString("dd.MM.yyyy") ?? "отсутствует",
+                            ReportText = rep?.ReportText ?? "не выполнено",
+                            Complete = (rep?.Complete != null && rep.Complete.Value) ? "Да" : "Нет",
                         });
                     }
                 }
             });
-
             ListViewReports.ItemsSource = _listReports.OrderByDescending(l => l.DateTime);
             CollectionView view =
                 (CollectionView) CollectionViewSource.GetDefaultView(ListViewReports.ItemsSource);
