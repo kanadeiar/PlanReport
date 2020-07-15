@@ -126,13 +126,14 @@ namespace WpfAppPlanReport
             {
                 using (var context = new PlanReportEntities())
                 {
+                    var beginDate = DateTime.Now.Date;
                     foreach (var plan in context.Plans.Where(p =>
                         (p.Datetime == DateTime.Now || 
                          p.Reports.Count == 0 ||
                          !(p.Reports.Select(r => r.Complete).Contains(true)) ||
-                         (p.Reports.Select(r=> r.Datetime).Contains(DateTime.Now)) )))
+                         (p.Reports.Select(r=> r.Datetime).All(d => d >= beginDate)) )))
                     {
-                        var rep = plan.Reports.FirstOrDefault(r => r.Datetime.Value.Date == DateTime.Now.Date);
+                        var rep = plan.Reports.FirstOrDefault(r => r.Datetime != null && r.Datetime.Value.Date == DateTime.Now.Date);
                         _listReports.Add(new ReportsLVModel
                         {
                             Id = plan.Id,
@@ -191,17 +192,39 @@ namespace WpfAppPlanReport
                         MessageBox.Show("Ошибка!\n" + ex.InnerException?.Message);
                     }
                 }
-                await ViewDataListViewReportsAsync();
             }
+            await ViewDataListViewReportsAsync();
         }
-        private void ButtonEditReport_OnClick(object sender, RoutedEventArgs e)
+        private async void ButtonEditReport_OnClick(object sender, RoutedEventArgs e)
         {
             var select = (ReportsLVModel)ListViewReports.SelectedItem;
             if (select == null)
                 return;
             if (select.ReportId == -1)
                 return;
-
+            using (var context = new PlanReportEntities())
+            {
+                var editReport = await context.Reports.FindAsync(select.ReportId);
+                EditReportWindow window = new EditReportWindow
+                {
+                    Report = editReport,
+                    PlanText = select.PlanText,
+                    Title = "Изменение выбранного отчета",
+                };
+                window.ShowDialog();
+                if (window.DialogResult.HasValue && window.DialogResult.Value)
+                {
+                    try
+                    {
+                        await context.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Ошибка!\n" + ex.InnerException?.Message);
+                    }
+                }
+            }
+            await ViewDataListViewReportsAsync();
         }
         private void ButtonDeleteReport_OnClick(object sender, RoutedEventArgs e)
         {

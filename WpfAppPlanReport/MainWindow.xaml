@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfAppPlanReport"
         mc:Ignorable="d"
-        Title="План-Отчет" Height="500" Width="700" WindowStartupLocation="CenterScreen" Loaded="MainWindow_OnLoaded" Icon="clipboard.ico">
+        Title="План-Отчет" Height="700" Width="900" WindowStartupLocation="CenterScreen" Loaded="MainWindow_OnLoaded" Icon="clipboard.ico">
     <Window.Resources>
     </Window.Resources>
     <DockPanel>
