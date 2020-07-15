@@ -121,7 +121,42 @@
                 </DockPanel>
             </TabItem>
             <TabItem Header="Составление планов на завтра">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                        <Button x:Name="ButtonRefreshPlans" Content="Обновить" Width="100" Margin="3" Click="ButtonRefreshPlans_OnClick"/>
+                    </StackPanel>
+                    <GroupBox DockPanel.Dock="Bottom" Header="Составление планов">
+                        <WrapPanel>
+                            <Button x:Name="ButtonAddPlan" Content="Добавить" Width="100" Margin="5" Click="ButtonAddPlan_OnClick"/>
+                            <Button x:Name="ButtonEditPlan" Content="Редактировать" Width="100" Margin="5" Click="ButtonEditPlan_OnClick"/>
+                            <Button x:Name="ButtonDeletePlan" Content="Удалить" Width="100" Margin="5" Click="ButtonDeletePlan_OnClick"/>
+                        </WrapPanel>
+                    </GroupBox>
+                    <GroupBox DockPanel.Dock="Bottom" Header="Сведения о плане:" DataContext="{Binding SelectedItem, ElementName=ListViewReports}">
+                        <WrapPanel>
 
+                        </WrapPanel>
+                    </GroupBox>
+                    <GroupBox Header="Планы на завтра">
+                        <ListView x:Name="ListViewPlans" Margin="5">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="Дата" Width="80" DisplayMemberBinding="{Binding DateTime}"/>
+                                    <GridViewColumn Header="Текст Плана работ" Width="250" DisplayMemberBinding="{Binding PlanText}"/>
+                                 </GridView>
+                            </ListView.View>
+                            <ListView.GroupStyle>
+                                <GroupStyle>
+                                    <GroupStyle.HeaderTemplate>
+                                        <DataTemplate>
+                                            <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
+                                        </DataTemplate>
+                                    </GroupStyle.HeaderTemplate>
+                                </GroupStyle>
+                            </ListView.GroupStyle>
+                        </ListView>
+                    </GroupBox>
+                </DockPanel>
             </TabItem>
         </TabControl>
     </DockPanel>

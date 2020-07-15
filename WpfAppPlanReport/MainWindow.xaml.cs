@@ -39,6 +39,7 @@ namespace WpfAppPlanReport
             
             await ViewDataInListViewAsync();
             await ViewDataListViewReportsAsync();
+            await ViewDataListViewPlansAsync();
         }
         #region ListViewAll
         /// <summary> Отображаемые данные по всем </summary>
@@ -247,6 +248,38 @@ namespace WpfAppPlanReport
                 }
             }
             await ViewDataListViewReportsAsync();
+        }
+        #endregion
+
+        #region ListViewPlans
+        class PlansLVModel
+        {
+            public int Id { get; set; }
+            public string DepName { get; set; }
+            public string DateTime { get; set; }
+            public string PlanText { get; set; }
+        }
+        private async Task ViewDataListViewPlansAsync()
+        {
+
+        }
+        private async void ButtonRefreshPlans_OnClick(object sender, RoutedEventArgs e)
+        {
+            ButtonRefreshPlans.IsEnabled = false;
+            await ViewDataListViewPlansAsync();
+            ButtonRefreshPlans.IsEnabled = true;
+        }
+        private void ButtonAddPlan_OnClick(object sender, RoutedEventArgs e)
+        {
+            
+        }
+        private void ButtonEditPlan_OnClick(object sender, RoutedEventArgs e)
+        {
+            
+        }
+        private void ButtonDeletePlan_OnClick(object sender, RoutedEventArgs e)
+        {
+            
         }
         #endregion
 
