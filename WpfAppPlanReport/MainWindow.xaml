@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfAppPlanReport"
         mc:Ignorable="d"
-        Title="План-Отчет" Height="500" Width="700" WindowStartupLocation="CenterScreen" Loaded="MainWindow_OnLoaded">
+        Title="План-Отчет" Height="500" Width="700" WindowStartupLocation="CenterScreen" Loaded="MainWindow_OnLoaded" Icon="clipboard.ico">
     <Window.Resources>
     </Window.Resources>
     <DockPanel>
@@ -36,7 +36,7 @@
                                 <TextBlock Text="{Binding ReportDateTime}" Width="100" FontWeight="Bold"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="5">
-                                <TextBlock Text="Отчет о выполнении:" Margin="0,0,5,0"/>
+                                <TextBlock Text="Последний отчет о выполнении:" Margin="0,0,5,0"/>
                                 <TextBlock Text="{Binding ReportText}" Width="300" Height="30" TextWrapping="Wrap" FontWeight="Bold"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="5">

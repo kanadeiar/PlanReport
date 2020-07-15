@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Documents;
 using WpfAppPlanReport.EF;
+using WpfAppPlanReport.Windows;
 
 namespace WpfAppPlanReport
 {
@@ -36,8 +37,8 @@ namespace WpfAppPlanReport
                     Database.SetInitializer(new DropCreateDatabaseAlways<PlanReportEntities>());
             }
             
-            await ViewDataInListView();
-            await ViewDataListViewReports();
+            await ViewDataInListViewAsync();
+            await ViewDataListViewReportsAsync();
         }
         #region ListViewAll
         /// <summary> Отображаемые данные по всем </summary>
@@ -50,7 +51,7 @@ namespace WpfAppPlanReport
             public string ReportText { get; set; }
             public string Complete { get; set; }
         }
-        private async Task ViewDataInListView()
+        private async Task ViewDataInListViewAsync()
         {
             _listPlanReport.Clear();
             await Task.Run(() =>
@@ -85,21 +86,21 @@ namespace WpfAppPlanReport
         private async void ButtonRefresh_OnClick(object sender, RoutedEventArgs e)
         {
             ButtonRefresh.IsEnabled = false;
-            await ViewDataInListView();
+            await ViewDataInListViewAsync();
             ButtonRefresh.IsEnabled = true;
         }
         private async void ButtonAll_OnClick(object sender, RoutedEventArgs e)
         {
             _visibleNoCompleteOnly = false;
             ButtonRefresh.IsEnabled = false;
-            await ViewDataInListView();
+            await ViewDataInListViewAsync();
             ButtonRefresh.IsEnabled = true;
         }
         private async void ButtonNoComplete_OnClick(object sender, RoutedEventArgs e)
         {
             _visibleNoCompleteOnly = true;
             ButtonRefresh.IsEnabled = false;
-            await ViewDataInListView();
+            await ViewDataInListViewAsync();
             ButtonRefresh.IsEnabled = true;
         }
         #endregion
@@ -118,7 +119,7 @@ namespace WpfAppPlanReport
             public string ReportText { get; set; }
             public string Complete { get; set; }
         }
-        private async Task ViewDataListViewReports()
+        private async Task ViewDataListViewReportsAsync()
         {
             _listReports.Clear();
             await Task.Run(() =>
@@ -131,7 +132,7 @@ namespace WpfAppPlanReport
                          !(p.Reports.Select(r => r.Complete).Contains(true)) ||
                          (p.Reports.Select(r=> r.Datetime).Contains(DateTime.Now)) )))
                     {
-                        var rep = plan.Reports.FirstOrDefault(r => r.Datetime == DateTime.Now);
+                        var rep = plan.Reports.FirstOrDefault(r => r.Datetime.Value.Date == DateTime.Now.Date);
                         _listReports.Add(new ReportsLVModel
                         {
                             Id = plan.Id,
@@ -155,18 +156,43 @@ namespace WpfAppPlanReport
         private async void ButtonRefreshReport_OnClick(object sender, RoutedEventArgs e)
         {
             ButtonRefreshReport.IsEnabled = false;
-            await ViewDataListViewReports();
+            await ViewDataListViewReportsAsync();
             ButtonRefreshReport.IsEnabled = true;
         }
-        private void ButtonAddReport_OnClick(object sender, RoutedEventArgs e)
+        private async void ButtonAddReport_OnClick(object sender, RoutedEventArgs e)
         {
             var select = (ReportsLVModel)ListViewReports.SelectedItem;
             if (select == null)
                 return;
             if (select.ReportId != -1)
                 return;
-
-
+            using (var context = new PlanReportEntities())
+            {
+                var newReport = new Report
+                {
+                    PlanId = select.Id,
+                };
+                EditReportWindow window = new EditReportWindow
+                {
+                    Report = newReport,
+                    PlanText = select.PlanText,
+                    Title = "Добавление нового отчета",
+                };
+                window.ShowDialog();
+                if (window.DialogResult.HasValue && window.DialogResult.Value)
+                {
+                    try
+                    {
+                        context.Reports.Add(newReport);
+                        await context.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Ошибка!\n" + ex.InnerException?.Message);
+                    }
+                }
+                await ViewDataListViewReportsAsync();
+            }
         }
         private void ButtonEditReport_OnClick(object sender, RoutedEventArgs e)
         {
