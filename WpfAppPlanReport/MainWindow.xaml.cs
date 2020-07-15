@@ -226,14 +226,27 @@ namespace WpfAppPlanReport
             }
             await ViewDataListViewReportsAsync();
         }
-        private void ButtonDeleteReport_OnClick(object sender, RoutedEventArgs e)
+        private async void ButtonDeleteReport_OnClick(object sender, RoutedEventArgs e)
         {
             var select = (ReportsLVModel)ListViewReports.SelectedItem;
             if (select == null)
                 return;
             if (select.ReportId == -1)
                 return;
-
+            using (var context = new PlanReportEntities())
+            {
+                var delReport = new Report {Id = select.ReportId};
+                context.Entry(delReport).State = EntityState.Deleted;
+                try
+                {
+                    await context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Ошибка!\n" + ex.InnerException?.Message);
+                }
+            }
+            await ViewDataListViewReportsAsync();
         }
         #endregion
 
