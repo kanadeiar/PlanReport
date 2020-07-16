@@ -324,17 +324,38 @@ namespace WpfAppPlanReport
             }
             await ViewDataListViewPlansAsync();
         }
-        private void ButtonEditPlan_OnClick(object sender, RoutedEventArgs e)
+        private async void ButtonEditPlan_OnClick(object sender, RoutedEventArgs e)
         {
-            var select = (ReportsLVModel)ListViewReports.SelectedItem;
+            var select = (PlansLVModel)ListViewPlans.SelectedItem;
             if (select == null)
                 return;
-            
-
+            using (var context = new PlanReportEntities())
+            {
+                var editPlan = await context.Plans.FindAsync(select.Id);
+                EditPlanWindow window = new EditPlanWindow
+                {
+                    Plan = editPlan,
+                    Departments = context.Departments.ToList(),
+                    Title = "Изменение выбранного плана",
+                };
+                window.ShowDialog();
+                if (window.DialogResult.HasValue && window.DialogResult.Value)
+                {
+                    try
+                    {
+                        await context.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Ошибка!\n" + ex.Message + "\n" + ex.InnerException?.Message);
+                    }
+                }
+            }
+            await ViewDataListViewPlansAsync();
         }
         private void ButtonDeletePlan_OnClick(object sender, RoutedEventArgs e)
         {
-            var select = (ReportsLVModel)ListViewReports.SelectedItem;
+            var select = (PlansLVModel)ListViewPlans.SelectedItem;
             if (select == null)
                 return;
 
