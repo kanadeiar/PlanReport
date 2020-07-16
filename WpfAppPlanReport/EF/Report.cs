@@ -19,6 +19,8 @@ namespace WpfAppPlanReport.EF
         [StringLength(200)]
         public string ReportText { get; set; }
 
+        public bool? Complete { get; set; }
+
         public virtual Plan Plan { get; set; }
     }
 }
