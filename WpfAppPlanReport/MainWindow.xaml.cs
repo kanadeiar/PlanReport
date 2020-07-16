@@ -19,6 +19,7 @@ namespace WpfAppPlanReport
         private List<PlanReportLVModel> _listPlanReport = new List<PlanReportLVModel>();
         private bool _visibleNoCompleteOnly;
         private List<ReportsLVModel> _listReports = new List<ReportsLVModel>();
+        private List<PlansLVModel> _listPlans = new List<PlansLVModel>();
         public MainWindow()
         {
             InitializeComponent();
@@ -127,12 +128,13 @@ namespace WpfAppPlanReport
             {
                 using (var context = new PlanReportEntities())
                 {
+                    var prevDate = DateTime.Now.AddDays(-1).Date;
                     var beginDate = DateTime.Now.Date;
                     foreach (var plan in context.Plans.Where(p =>
-                        (p.Datetime == DateTime.Now || 
-                         p.Reports.Count == 0 ||
-                         !(p.Reports.Select(r => r.Complete).Contains(true)) ||
-                         (p.Reports.Select(r=> r.Datetime).All(d => d >= beginDate)) )))
+                        ((p.Datetime > prevDate && p.Datetime < beginDate) || 
+                         (p.Datetime < prevDate && p.Reports.Count == 0) ||
+                         (p.Datetime < prevDate && !(p.Reports.Select(r => r.Complete).Contains(true))) ||
+                         (p.Datetime < prevDate && p.Reports.Select(r=> r.Datetime).All(d => d >= beginDate)) )))
                     {
                         var rep = plan.Reports.FirstOrDefault(r => r.Datetime != null && r.Datetime.Value.Date == DateTime.Now.Date);
                         _listReports.Add(new ReportsLVModel
@@ -261,7 +263,33 @@ namespace WpfAppPlanReport
         }
         private async Task ViewDataListViewPlansAsync()
         {
-
+            _listPlans.Clear();
+            await Task.Run(() =>
+            {
+                using (var context = new PlanReportEntities())
+                {
+                    var datePlusDay = DateTime.Now.AddDays(1);
+                    var beginDate = DateTime.Now.Date;
+                    foreach (var plan in context.Plans.Where(p =>
+                        (p.Datetime == datePlusDay || 
+                         p.Reports.Count == 0 ||
+                         !(p.Reports.Select(r => r.Complete).Contains(true)) )))
+                    {
+                        _listPlans.Add(new PlansLVModel
+                        {
+                            Id = plan.Id,
+                            DepName = plan.Department.Name,
+                            DateTime = plan.Datetime?.ToString("dd.MM.yyyy"),
+                            PlanText = plan.PlanText,
+                        });
+                    }
+                }
+            });
+            ListViewPlans.ItemsSource = _listPlans.OrderByDescending(l => l.DateTime);
+            CollectionView view =
+                (CollectionView) CollectionViewSource.GetDefaultView(ListViewPlans.ItemsSource);
+            PropertyGroupDescription groupDescription = new PropertyGroupDescription("DepName");
+            view.GroupDescriptions.Add(groupDescription);
         }
         private async void ButtonRefreshPlans_OnClick(object sender, RoutedEventArgs e)
         {
@@ -269,17 +297,48 @@ namespace WpfAppPlanReport
             await ViewDataListViewPlansAsync();
             ButtonRefreshPlans.IsEnabled = true;
         }
-        private void ButtonAddPlan_OnClick(object sender, RoutedEventArgs e)
+        private async void ButtonAddPlan_OnClick(object sender, RoutedEventArgs e)
         {
-            
+            using (var context = new PlanReportEntities())
+            {
+                var newPlan = new Plan();
+                EditPlanWindow window = new EditPlanWindow
+                {
+                    Plan = newPlan,
+                    Departments = context.Departments.ToList(),
+                    Title = "Добавление нового плана",
+                };
+                window.ShowDialog();
+                if (window.DialogResult.HasValue && window.DialogResult.Value)
+                {
+                    try
+                    {
+                        context.Plans.Add(newPlan);
+                        await context.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Ошибка!\n" + ex.Message + "\n" + ex.InnerException?.Message);
+                    }
+                }
+            }
+            await ViewDataListViewPlansAsync();
         }
         private void ButtonEditPlan_OnClick(object sender, RoutedEventArgs e)
         {
+            var select = (ReportsLVModel)ListViewReports.SelectedItem;
+            if (select == null)
+                return;
             
+
         }
         private void ButtonDeletePlan_OnClick(object sender, RoutedEventArgs e)
         {
-            
+            var select = (ReportsLVModel)ListViewReports.SelectedItem;
+            if (select == null)
+                return;
+
+
         }
         #endregion
 
