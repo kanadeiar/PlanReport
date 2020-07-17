@@ -130,11 +130,12 @@ namespace WpfAppPlanReport
                 {
                     var prevDate = DateTime.Now.AddDays(-1).Date;
                     var beginDate = DateTime.Now.Date;
+
                     foreach (var plan in context.Plans.Where(p =>
-                        ((p.Datetime > prevDate && p.Datetime < beginDate) || 
-                         (p.Datetime < prevDate && p.Reports.Count == 0) ||
-                         (p.Datetime < prevDate && !(p.Reports.Select(r => r.Complete).Contains(true))) ||
-                         (p.Datetime < prevDate && p.Reports.Select(r=> r.Datetime).All(d => d >= beginDate)) )))
+                        ((p.Datetime >= prevDate && p.Datetime <= beginDate) ||
+                         (p.Datetime <= prevDate && p.Reports.Count == 0) ||
+                         (p.Datetime <= prevDate && !(p.Reports.Select(r => r.Complete).Contains(true))) ||
+                         (p.Datetime <= prevDate && p.Reports.Select(r => r.Datetime).All(d => d >= beginDate)) )))
                     {
                         var rep = plan.Reports.FirstOrDefault(r => r.Datetime != null && r.Datetime.Value.Date == DateTime.Now.Date);
                         _listReports.Add(new ReportsLVModel
@@ -374,8 +375,6 @@ namespace WpfAppPlanReport
             await ViewDataListViewPlansAsync();
         }
         #endregion
-
-
 
     }
 }
